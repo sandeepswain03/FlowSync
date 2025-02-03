@@ -4,7 +4,7 @@ import { motion } from "framer-motion"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../components/ui/dialog"
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
-import { axiosInstance } from "@/axiosInstance"
+import { axiosInstance } from "@/Instance/axiosInstance"
 
 interface CreateProjectPayload {
     name: string

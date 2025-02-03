@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from 'framer-motion';
-import { axiosInstance } from '../../axiosInstance';
+import { axiosInstance } from '@/Instance/axiosInstance';
 import { UserContext } from '../../context/UserContext';
 import * as z from "zod";
 

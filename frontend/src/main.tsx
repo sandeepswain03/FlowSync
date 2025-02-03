@@ -1,4 +1,3 @@
-import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import { UserContextProvider } from './context/UserContext'
@@ -8,9 +7,8 @@ import './index.css'
 createRoot(document.getElementById('root')!).render(
   <Router>
     <UserContextProvider>
-      <StrictMode>
-        <App />
-      </StrictMode>
+      <App />
     </UserContextProvider>
   </Router >
+
 )

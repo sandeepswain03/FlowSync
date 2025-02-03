@@ -1,6 +1,6 @@
 import { createContext, ReactNode, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { axiosInstance, setupAxiosInterceptors } from "../axiosInstance";
+import { axiosInstance, setupAxiosInterceptors } from "@/Instance/axiosInstance";
 
 interface User {
   _id?: string;
