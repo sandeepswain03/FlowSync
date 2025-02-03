@@ -115,4 +115,37 @@ const getProjectById = asyncHandler(async (req, res) => {
     );
 });
 
-export { createProject, getProjects, addUserToProject, getProjectById };
+const updateFileTree = asyncHandler(async (req, res) => {
+    const { projectId, fileTree } = req.body;
+    if (!isValidObjectId(projectId)) {
+        throw new Error("Project ID is required");
+    }
+
+    const project = await Project.findById(projectId);
+    if (!project) throw new Error("Project not found");
+
+    const updateProject = await Project.findOneAndUpdate(
+        {
+            _id: projectId
+        },
+        {
+            fileTree
+        },
+        {
+            new: true
+        }
+    );
+    if (!updateProject) throw new Error("Project not found");
+
+    return res.json(
+        new apiResponse(200, updateProject, "File tree updated successfully")
+    );
+});
+
+export {
+    createProject,
+    getProjects,
+    addUserToProject,
+    getProjectById,
+    updateFileTree
+};

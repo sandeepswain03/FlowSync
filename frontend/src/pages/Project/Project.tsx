@@ -49,7 +49,7 @@ function SyntaxHighlightedCode(props: any) {
             window.hljs.highlightElement(ref.current)
             ref.current.removeAttribute("data-highlighted")
         }
-    }, [props.className])
+    }, [props.className, props.children])
 
     return <code {...props} ref={ref} />
 }
@@ -67,6 +67,7 @@ const Project: React.FC = () => {
     const [webContainer, setWebContainer] = useState<any>(null)
     const [iframeUrl, setIframeUrl] = useState<string | null>(null)
     const [runProcess, setRunProcess] = useState<any>(null)
+    const [fileTree, setFileTree] = useState({})
     const { register, handleSubmit, reset } = useForm<{ message: string }>()
     const location = useLocation()
     const { user } = useContext(UserContext)
@@ -90,6 +91,8 @@ const Project: React.FC = () => {
         try {
             const response = await axiosInstance.get(`/project/get-project/${location.state?.project?._id}`)
             setProject(response.data.data)
+            setFileTree(response.data.data.fileTree || {})
+            setIsSidePanelOpen(false) // Close sheet when fetching project
         } catch (error) {
             console.log("Error fetching project:", error)
         }
@@ -111,7 +114,9 @@ const Project: React.FC = () => {
             console.log(message)
             webContainer?.mount(message.fileTree)
             if (message.fileTree) {
+                setFileTree(message.fileTree)
                 setProject((prev) => (prev ? { ...prev, fileTree: message.fileTree } : null))
+                setIsSidePanelOpen(false) // Close sheet when receiving file tree
             }
         }
         setMessages((prevMessages) => [...prevMessages, data])
@@ -160,15 +165,18 @@ const Project: React.FC = () => {
                 projectId: project?._id,
                 fileTree: ft,
             })
+            setFileTree(ft)
+            setIsSidePanelOpen(false) // Close sheet after saving
         } catch (error) {
             console.error("Error saving file tree:", error)
         }
     }
 
     const runProject = async () => {
-        if (!webContainer || !project?.fileTree) return
+        if (!webContainer || !fileTree) return
 
-        await webContainer.mount(project.fileTree)
+        setIsSidePanelOpen(false) // Close sheet before running
+        await webContainer.mount(fileTree)
         const installProcess = await webContainer.spawn("npm", ["install"])
 
         installProcess.output.pipeTo(
@@ -269,21 +277,21 @@ const Project: React.FC = () => {
                 <div className="w-64 bg-secondary p-4">
                     <h2 className="text-lg font-semibold mb-4">Files</h2>
                     <ScrollArea className="h-[calc(100vh-100px)]">
-                        {project?.fileTree &&
-                            Object.keys(project.fileTree).map((file) => (
-                                <Button
-                                    key={file}
-                                    variant="ghost"
-                                    className="w-full justify-start"
-                                    onClick={() => {
-                                        setCurrentFile(file)
-                                        setOpenFiles((prev) => [...new Set([...prev, file])])
-                                    }}
-                                >
-                                    <i className="ri-file-text-line mr-2" />
-                                    {file}
-                                </Button>
-                            ))}
+                        {Object.keys(fileTree).map((file) => (
+                            <Button
+                                key={file}
+                                variant="ghost"
+                                className="w-full justify-start"
+                                onClick={() => {
+                                    setCurrentFile(file)
+                                    setOpenFiles((prev) => [...new Set([...prev, file])])
+                                    setIsSidePanelOpen(false) // Close sheet when selecting file
+                                }}
+                            >
+                                <i className="ri-file-text-line mr-2" />
+                                {file}
+                            </Button>
+                        ))}
                     </ScrollArea>
                 </div>
 
@@ -304,7 +312,7 @@ const Project: React.FC = () => {
                         <Button onClick={runProject}>Run</Button>
                     </div>
                     <div className="flex-grow p-4 overflow-auto">
-                        {currentFile && project?.fileTree?.[currentFile] ? (
+                        {currentFile && fileTree[currentFile] ? (
                             <pre className="h-full">
                                 <code
                                     className="hljs h-full outline-none"
@@ -313,18 +321,19 @@ const Project: React.FC = () => {
                                     onBlur={(e) => {
                                         const updatedContent = e.currentTarget.innerText
                                         const updatedFileTree = {
-                                            ...project.fileTree,
+                                            ...fileTree,
                                             [currentFile]: {
                                                 file: {
                                                     contents: updatedContent,
                                                 },
                                             },
                                         }
+                                        setFileTree(updatedFileTree)
                                         setProject((prev) => (prev ? { ...prev, fileTree: updatedFileTree } : null))
                                         saveFileTree(updatedFileTree)
                                     }}
                                     dangerouslySetInnerHTML={{
-                                        __html: hljs.highlight("javascript", project.fileTree[currentFile].file.contents).value,
+                                        __html: hljs.highlight("javascript", fileTree[currentFile].file.contents).value,
                                     }}
                                 />
                             </pre>
@@ -410,4 +419,3 @@ const Project: React.FC = () => {
 }
 
 export default Project
-

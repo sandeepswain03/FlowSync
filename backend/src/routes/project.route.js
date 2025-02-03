@@ -4,7 +4,8 @@ import {
     createProject,
     getProjects,
     addUserToProject,
-    getProjectById
+    getProjectById,
+    updateFileTree
 } from "../controllers/project.controller.js";
 import checkAuth from "../middlewares/auth.middleware.js";
 
@@ -33,5 +34,20 @@ router.put(
 );
 
 router.get("/get-project/:projectId", checkAuth, getProjectById);
+
+router.put(
+    "/update-file-tree",
+    body("projectId").isString().withMessage("Project ID is required"),
+    body("fileTree")
+        .isObject()
+        .withMessage("File tree must be an object")
+        .bail()
+        .custom((fileTree) =>
+            Object.keys(fileTree).every((file) => typeof file === "string")
+        )
+        .withMessage("Each file must be a string"),
+    checkAuth,
+    updateFileTree
+);
 
 export default router;

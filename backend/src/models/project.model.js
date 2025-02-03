@@ -15,8 +15,9 @@ const projectSchema = new Schema(
                 ref: "User"
             }
         ],
-        socketId: {
-            type: String
+        fileTree: {
+            type: Object,
+            default: {}
         }
     },
     { timestamps: true }
