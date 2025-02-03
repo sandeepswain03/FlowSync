@@ -1,21 +1,21 @@
-import React, { useState, useEffect, useContext, useRef } from "react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { useState, useEffect, useContext, useRef } from "react"
 import { useLocation } from "react-router-dom"
 import { motion } from "framer-motion"
 import { useForm } from "react-hook-form"
 import { axiosInstance } from "@/Instance/axiosInstance"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { X, Menu, Send } from "lucide-react"
 import { initializeSocket, receiveMessage, sendMessage } from "@/Instance/socketInstance"
+import { getWebContainer } from "@/Instance/webContainer"
 import { UserContext } from "@/context/UserContext"
+import { X, Menu, Send } from "lucide-react"
 import Markdown from "markdown-to-jsx"
 import hljs from "highlight.js"
-import { getWebContainer } from "@/config/webContainer"
 
 interface User {
     _id: string
@@ -44,7 +44,7 @@ interface Message {
 function SyntaxHighlightedCode(props: any) {
     const ref = useRef<HTMLElement>(null)
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (ref.current && props.className?.includes("lang-") && window.hljs) {
             window.hljs.highlightElement(ref.current)
             ref.current.removeAttribute("data-highlighted")
